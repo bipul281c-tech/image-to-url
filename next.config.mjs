@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactCompiler: true,
-  cacheComponents: false,
+  // Disabled reactCompiler due to Turbopack build issues on Vercel
+  // reactCompiler: true,
+  // cacheComponents: false,
   typescript: {
     ignoreBuildErrors: true,
   },
