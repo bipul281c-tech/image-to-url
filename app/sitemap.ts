@@ -83,23 +83,6 @@ const publicRoutes = scanPublicRoutes(
 export default function sitemap(): MetadataRoute.Sitemap {
     const entries: MetadataRoute.Sitemap = []
 
-    // Add root URL entry (served via rewrite, no redirect)
-    const rootLanguages: Record<string, string> = {}
-    for (const locale of locales) {
-        rootLanguages[locale] = `${BASE_URL}/${locale}`
-    }
-    rootLanguages['x-default'] = BASE_URL
-
-    entries.push({
-        url: BASE_URL,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 1.0,
-        alternates: {
-            languages: rootLanguages,
-        },
-    })
-
     // Generate entries for each route and locale
     for (const route of publicRoutes) {
         for (const locale of locales) {
