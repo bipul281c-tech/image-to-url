@@ -28,17 +28,12 @@ export async function proxy(request: NextRequest) {
   // Check if pathname already has a locale
   const pathnameHasLocale = locales.some((locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`)
 
-  // Handle root path with rewrite (keeps URL as /) for better SEO
-  if (pathname === '/') {
-    const locale = getLocale(request)
-    return NextResponse.rewrite(new URL(`/${locale}`, request.url))
-  }
-
-  // Handle other paths without locale - redirect to add locale prefix
+  // Handle locale redirect
   if (!pathnameHasLocale) {
     const locale = getLocale(request)
     request.nextUrl.pathname = `/${locale}${pathname}`
-    return NextResponse.redirect(request.nextUrl)
+    // Use permanent redirect (301) for SEO - tells search engines this is the canonical URL
+    return NextResponse.redirect(request.nextUrl, { status: 301 })
   }
 
   // Update Supabase session

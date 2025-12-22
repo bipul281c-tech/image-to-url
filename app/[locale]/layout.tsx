@@ -1,8 +1,10 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { locales, type Locale, defaultLocale } from "@/lib/i18n/config"
+import { locales, type Locale } from "@/lib/i18n/config"
 import { getDictionary } from "@/lib/i18n/dictionaries"
 import { getAlternateLinks } from "@/lib/i18n/get-alternate-links"
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://imagetourl.cloud"
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
@@ -15,22 +17,22 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params
   const dict = await getDictionary(locale)
-  const alternates = getAlternateLinks("/", locale)
+  const languages = getAlternateLinks("/", locale)
 
   return {
     title: dict.meta.title,
     description: dict.meta.description,
     keywords: dict.meta.keywords,
     generator: "v0.app",
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://imagetourl.cloud"),
+    metadataBase: new URL(BASE_URL),
     alternates: {
-      canonical: `/${locale}`,
-      languages: Object.fromEntries(alternates.map((alt) => [alt.locale, alt.url])),
+      canonical: `${BASE_URL}/${locale}`,
+      languages,
     },
     openGraph: {
       title: dict.meta.title,
       description: dict.meta.description,
-      url: `/${locale}`,
+      url: `${BASE_URL}/${locale}`,
       siteName: "ImageToURL",
       locale: locale,
       type: "website",
@@ -60,17 +62,17 @@ export async function generateMetadata({
       ],
       apple: '/apple-touch-icon.png',
     },
-    other: {
-      "x-default": `${process.env.NEXT_PUBLIC_SITE_URL || "https://imagetourl.cloud"}/${defaultLocale}`,
-    },
   }
 }
 
 export default async function LocaleLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
   params: Promise<{ locale: Locale }>
 }) {
-  return <>{children}</>
+  const { locale } = await params
+
+  return <div lang={locale}>{children}</div>
 }
